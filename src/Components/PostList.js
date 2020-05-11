@@ -1,17 +1,18 @@
 import React,{Component} from 'react';
 import {connect}  from 'react-redux';
-import { fetchPosts } from '../actions';
+import { fetchPostsAndUser } from '../actions';
 import UserHeader from './UserHeader';
 
 class PostList extends Component{
 
     // after the app render first time then call this function 
     componentDidMount(){
-        this.props.fetchPosts();
+        this.props.fetchPostsAndUser();
     }
     
     renderList = ()=>{
-        return this.props.posts.slice(0,10).map( post =>{
+        console.log(this.props.posts);
+        return this.props.posts.map( post =>{
             return (
                 <div className="item" key={post.id}>
                     <i className =" large middgle aligned icon user"></i>
@@ -29,7 +30,7 @@ class PostList extends Component{
 
     render(){
         // the initial: first time run , posts = []
-        console.log(this.props.posts);
+      
         return (
             
         <div className ="ui divided list">
@@ -43,4 +44,4 @@ const mapStateToProps = (state)=>{
     return{ posts: state.posts}; 
 };
 // using HOC to pass state = null - initial state and action from action creator
-export default connect(mapStateToProps,{fetchPosts})(PostList);
+export default connect(mapStateToProps,{fetchPostsAndUser})(PostList);

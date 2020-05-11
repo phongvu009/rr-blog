@@ -9,6 +9,8 @@
 // !compasion of 2 different memory addresses.
 // if somehow state argument ===  return state nothing change, no update to the app .
 export default (state=[],action)=>{
+    // action object = {type: @@redux?INIT} from inital stage by redux library
+    // console.log(JSON.stringify({action}));
     // if(action.type === 'FETCH_POSTS'){
     //     return action.payload;
     // }

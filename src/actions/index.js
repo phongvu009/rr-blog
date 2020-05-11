@@ -1,5 +1,5 @@
 // action creator
-
+import _ from 'lodash';
 // add endpoint api 
 import jsonPlaceHolder from '../apis/jsonPlaceHolder';
 // !problem : using asynchronous in action creator!!
@@ -24,10 +24,11 @@ import jsonPlaceHolder from '../apis/jsonPlaceHolder';
 export const fetchPosts = ()=>{
     // clousure: function return a fucntion. pass callback: dispatch as params
     // fetchPost = ()=> async dispatch =>{}; ~ less syntax way
+    // callback : dispatch = store.dispatch
     return async (dispatch)=>{
 
         const response = await jsonPlaceHolder.get('/posts'); //pass params to the endpoint
-        // pass thre objection action result as params
+        // pass the objection action result as params
         
         dispatch({
             type: 'FETCH_POSTS',
@@ -36,8 +37,9 @@ export const fetchPosts = ()=>{
     }
 };
 
+
 export const fetchUser = (id)=>{
-    return async (dispatch)=>{
+    return async  (dispatch)=>{
         const response = await jsonPlaceHolder.get(`/users/${id}`);
 
         dispatch({
@@ -45,4 +47,85 @@ export const fetchUser = (id)=>{
             payload: response.data
         });
     }
+};
+
+
+// Solution 1:
+// use lodash library to create memorise function
+// since the userId get fectch repeatly we need to fix it to get call one time
+// for each userId
+// this can do fetch one time if using memoize
+// export const fetchUser = (id)=>{
+//     return (dispatch)=>{
+//        return _fetchUser(id,dispatch);
+//     }
+// };
+
+// wrap a function to the dispatch
+// const _fetchUser = _.memoize(async(id, dispatch)=>{
+//     const response = await jsonPlaceHolder.get(`/users/${id}`);
+
+//     dispatch({
+//         type:'FETCH_USER',
+//         payload: response.data
+//     });
+// });
+
+// Solution 2: create fetchPostsAndUser function
+
+export const fetchPostsAndUser = ()=> async (dispatch,getState )=>{ //return a Promise
+     //  this function goes to middleware function = thunk
+//  thunk pick it up and invoke it
+
+//  wait for the result of the Promise from dispatch(fetchPosts()) 
+// and the go to next function
+  await  dispatch(fetchPosts()); 
+  const userId = _.uniq(_.map(getState().posts, 'userId'));
+  // no need to use await since there is no other function down  
+  userId.forEach(id => dispatch(fetchUser(id)));
+  
+//! If it's a function, call it.
+// if (typeof action === 'function') {
+// return action(dispatch, getState, extraArgument); 
+
+// the return from the function is an Object Action 
+// and will go into thunk again
+// however this time it will go to reducers;
+};
+
+
+
+
+
+
+
+
+
+
+
+/**
+    https://daveceddia.com/what-is-a-thunk/
+
+function createThunkMiddleware(extraArgument) {
+  return ({ dispatch, getState }) => next => action => {
+		// This gets called for every action you dispatch.
+		// If it's a function, call it.
+    if (typeof action === 'function') {
+      return action(dispatch, getState, extraArgument);
+    }
+
+		// Otherwise, just continue processing this action as usual
+    return next(action);
+  };
 }
+
+const thunk = createThunkMiddleware();
+thunk.withExtraArgument = createThunkMiddleware;
+
+export default thunk;
+
+every action you dispatch will pass through this bit of code. 
+It calls actions that are functions (and returns whatever they return),
+and otherwise passes the action along to then next middleware, 
+or to Redux itself (which is what next(action) does).
+*/
