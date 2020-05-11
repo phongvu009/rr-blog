@@ -80,17 +80,22 @@ export const fetchPostsAndUser = ()=> async (dispatch,getState )=>{ //return a P
 //  wait for the result of the Promise from dispatch(fetchPosts()) 
 // and the go to next function
   await  dispatch(fetchPosts()); 
-  const userId = _.uniq(_.map(getState().posts, 'userId'));
-  // no need to use await since there is no other function down  
-  userId.forEach(id => dispatch(fetchUser(id)));
-  
+  // ? Refactor:
+  _.chain(getState().posts)
+    .map('userId')
+    .uniq()
+    .forEach(id => dispatch(fetchUser(id)));
+
+  // // get uniquer userId from posts and then pass id array to fectchUser
+  // const userId = _.uniq(_.map(getState().posts, 'userId'));
+  // // no need to use await since there is no other function down  
+  // userId.forEach(id => dispatch(fetchUser(id)));
+
 //! If it's a function, call it.
 // if (typeof action === 'function') {
 // return action(dispatch, getState, extraArgument); 
 
-// the return from the function is an Object Action 
-// and will go into thunk again
-// however this time it will go to reducers;
+
 };
 
 

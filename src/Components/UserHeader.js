@@ -2,7 +2,6 @@ import React from 'react';
 import {connect} from 'react-redux';
 
 
-
 class UserHeader extends React.Component{
     
 
@@ -21,7 +20,7 @@ class UserHeader extends React.Component{
 
     }
 };
-// ownPeops is the props of UserHeader
+// ownProps is the props of UserHeader
 const mapStateToProps = (state,ownProps) =>{
     return {
         user : state.users.find( user => user.id === ownProps.userId)

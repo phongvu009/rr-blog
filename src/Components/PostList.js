@@ -11,7 +11,7 @@ class PostList extends Component{
     }
     
     renderList = ()=>{
-        console.log(this.props.posts);
+   
         return this.props.posts.map( post =>{
             return (
                 <div className="item" key={post.id}>
